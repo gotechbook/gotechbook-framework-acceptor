@@ -12,6 +12,7 @@ import (
 )
 
 var _ acceptor.Acceptor = (*WS)(nil)
+var _ acceptor.Conn = (*Conn)(nil)
 
 type WS struct {
 	addr     string
@@ -39,25 +40,6 @@ func NewWS(addr string, certs ...string) *WS {
 	return w
 }
 
-type connHandler struct {
-	up       *websocket.Upgrader
-	connChan chan acceptor.Conn
-}
-
-func (h *connHandler) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
-	conn, err := h.up.Upgrade(rw, r, nil)
-	if err != nil {
-		logger.Log.Errorf("Upgrade failure, URI=%s, Error=%s", r.RequestURI, err.Error())
-		return
-	}
-
-	c, err := NewWSConn(conn)
-	if err != nil {
-		logger.Log.Errorf("Failed to create new ws connection: %s", err.Error())
-		return
-	}
-	h.connChan <- c
-}
 func (w *WS) ListenAndServe() {
 	if w.hasTLSCertificates() {
 		w.ListenAndServeTLS(w.certFile, w.keyFile)
@@ -123,8 +105,6 @@ func (w *WS) serve(up *websocket.Upgrader) {
 func (w *WS) hasTLSCertificates() bool {
 	return w.certFile != "" && w.keyFile != ""
 }
-
-var _ acceptor.Conn = (*Conn)(nil)
 
 type Conn struct {
 	conn   *websocket.Conn
@@ -206,4 +186,24 @@ func (c *Conn) SetReadDeadline(t time.Time) error {
 }
 func (c *Conn) SetWriteDeadline(t time.Time) error {
 	return c.conn.SetWriteDeadline(t)
+}
+
+type connHandler struct {
+	up       *websocket.Upgrader
+	connChan chan acceptor.Conn
+}
+
+func (h *connHandler) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
+	conn, err := h.up.Upgrade(rw, r, nil)
+	if err != nil {
+		logger.Log.Errorf("Upgrade failure, URI=%s, Error=%s", r.RequestURI, err.Error())
+		return
+	}
+
+	c, err := NewWSConn(conn)
+	if err != nil {
+		logger.Log.Errorf("Failed to create new ws connection: %s", err.Error())
+		return
+	}
+	h.connChan <- c
 }

@@ -18,8 +18,8 @@ var wsAcceptorTables = []struct {
 	certs    []string
 	panicErr error
 }{
-	{"test_1", "0.0.0.0:0", []byte{0x01, 0x02}, []string{"./fixtures/server.crt", "./fixtures/server.key"}, nil},
-	{"test_2", "127.0.0.1:0", []byte{0x00}, []string{"./fixtures/server.crt", "./fixtures/server.key"}, nil},
+	{"test_1", "0.0.0.0:0", []byte{0x01, 0x02}, []string{"../fixtures/server.crt", "../fixtures/server.key"}, nil},
+	{"test_2", "127.0.0.1:0", []byte{0x00}, []string{"../fixtures/server.crt", "../fixtures/server.key"}, nil},
 	{"test_3", "0.0.0.0:0", []byte{0x00}, []string{"wqodij"}, acceptor.ErrInvalidCertificates},
 	{"test_4", "0.0.0.0:0", []byte{0x00}, []string{"wqodij", "qwdo", "wod"}, acceptor.ErrInvalidCertificates},
 	{"test_4", "0.0.0.0:0", []byte{0x00}, []string{}, nil},
@@ -106,7 +106,7 @@ func TestWSAcceptorListenAndServeTLS(t *testing.T) {
 			w := NewWS(table.addr)
 			c := w.GetConnChan()
 			defer w.Stop()
-			go w.ListenAndServeTLS("./fixtures/server.crt", "./fixtures/server.key")
+			go w.ListenAndServeTLS("../fixtures/server.crt", "../fixtures/server.key")
 			mustConnectToWS(t, table.write, w, "wss")
 			conn := utils.ShouldEventuallyReceive(t, c, 100*time.Millisecond).(*Conn)
 			defer conn.Close()

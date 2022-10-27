@@ -30,6 +30,7 @@ var (
 	ErrInvalidHeader                  = errors.New("invalid header")
 	ErrReceivedMsgSmallerThanExpected = errors.New("received less data than expected, EOF")
 	ErrReceivedMsgBiggerThanExpected  = errors.New("received more data than expected")
+	ErrConnectionClosed               = errors.New("client connection closed")
 )
 
 type Acceptor interface {
