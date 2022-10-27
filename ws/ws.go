@@ -45,7 +45,6 @@ func (w *WS) ListenAndServe() {
 		w.ListenAndServeTLS(w.certFile, w.keyFile)
 		return
 	}
-
 	var up = websocket.Upgrader{
 		ReadBufferSize:  acceptor.IOBufferBytesSize,
 		WriteBufferSize: acceptor.IOBufferBytesSize,
@@ -58,7 +57,6 @@ func (w *WS) ListenAndServe() {
 		logger.Log.Fatalf("Failed to listen: %s", err.Error())
 	}
 	w.listener = listener
-
 	w.serve(&up)
 }
 func (w *WS) Stop() {
