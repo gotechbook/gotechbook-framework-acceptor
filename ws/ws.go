@@ -1,11 +1,10 @@
-package acceptor
+package ws
 
 import (
 	"crypto/tls"
 	"github.com/gorilla/websocket"
 	acceptor "github.com/gotechbook/gotechbook-framework-acceptor"
 	logger "github.com/gotechbook/gotechbook-framework-logger"
-	"github.com/gotechbook/gotechbook-framework-net/constants"
 	"net"
 	"net/http"
 )
@@ -24,7 +23,7 @@ func NewWS(addr string, certs ...string) *WS {
 	keyFile := ""
 	certFile := ""
 	if len(certs) != 2 && len(certs) != 0 {
-		panic(constants.ErrInvalidCertificates)
+		panic(acceptor.ErrInvalidCertificates)
 	} else if len(certs) == 2 {
 		certFile = certs[0]
 		keyFile = certs[1]
@@ -64,8 +63,8 @@ func (w *WS) ListenAndServe() {
 	}
 
 	var up = websocket.Upgrader{
-		ReadBufferSize:  constants.IOBufferBytesSize,
-		WriteBufferSize: constants.IOBufferBytesSize,
+		ReadBufferSize:  acceptor.IOBufferBytesSize,
+		WriteBufferSize: acceptor.IOBufferBytesSize,
 		CheckOrigin: func(r *http.Request) bool {
 			return true
 		},
@@ -95,8 +94,8 @@ func (w *WS) GetConnChan() chan acceptor.Conn {
 }
 func (w *WS) ListenAndServeTLS(cert, key string) {
 	var up = websocket.Upgrader{
-		ReadBufferSize:  constants.IOBufferBytesSize,
-		WriteBufferSize: constants.IOBufferBytesSize,
+		ReadBufferSize:  acceptor.IOBufferBytesSize,
+		WriteBufferSize: acceptor.IOBufferBytesSize,
 	}
 
 	crt, err := tls.LoadX509KeyPair(cert, key)

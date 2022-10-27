@@ -67,3 +67,32 @@ func (c *PacketCodec) Encode(typ Type, data []byte) ([]byte, error) {
 
 	return buf, nil
 }
+
+func ParseHeader(header []byte) (int, Type, error) {
+	if len(header) != HeadLength {
+		return 0, 0x00, ErrInvalidHeader
+	}
+	typ := header[0]
+	if typ < Handshake || typ > Kick {
+		return 0, 0x00, ErrWrongPacketType
+	}
+	size := BytesToInt(header[1:])
+	if size > MaxPacketSize {
+		return 0, 0x00, ErrPacketSizeExceed
+	}
+	return size, Type(typ), nil
+}
+func BytesToInt(b []byte) int {
+	result := 0
+	for _, v := range b {
+		result = result<<8 + int(v)
+	}
+	return result
+}
+func IntToBytes(n int) []byte {
+	buf := make([]byte, 3)
+	buf[0] = byte((n >> 16) & 0xFF)
+	buf[1] = byte((n >> 8) & 0xFF)
+	buf[2] = byte(n & 0xFF)
+	return buf
+}

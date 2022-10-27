@@ -24,7 +24,12 @@ const (
 )
 
 var (
-	ErrInvalidCertificates = errors.New("certificates must be exactly two")
+	ErrInvalidCertificates            = errors.New("certificates must be exactly two")
+	ErrWrongPacketType                = errors.New("wrong packet type")
+	ErrPacketSizeExceed               = errors.New("codec: packet size exceed")
+	ErrInvalidHeader                  = errors.New("invalid header")
+	ErrReceivedMsgSmallerThanExpected = errors.New("received less data than expected, EOF")
+	ErrReceivedMsgBiggerThanExpected  = errors.New("received more data than expected")
 )
 
 type Acceptor interface {

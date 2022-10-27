@@ -2,7 +2,6 @@ package acceptor
 
 import (
 	"bytes"
-	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -17,7 +16,7 @@ var forwardTables = map[string]struct {
 	"test_heartbeat_type":     {[]byte{Heartbeat, 0x00, 0x00, 0x00}, nil},
 	"test_data_type":          {[]byte{Data, 0x00, 0x00, 0x00}, nil},
 	"test_kick_type":          {[]byte{Kick, 0x00, 0x00, 0x00}, nil},
-	"test_wrong_packet_type":  {[]byte{0x06, 0x00, 0x00, 0x00}, errors.New("wrong packet type")},
+	"test_wrong_packet_type":  {[]byte{0x06, 0x00, 0x00, 0x00}, ErrWrongPacketType},
 }
 
 var (
@@ -31,7 +30,7 @@ var decodeTables = map[string]struct {
 	err    error
 }{
 	"test_not_enough_bytes": {[]byte{0x01}, nil, nil},
-	"test_error_on_forward": {invalidHeader, nil, errors.New("wrong packet type")},
+	"test_error_on_forward": {invalidHeader, nil, ErrWrongPacketType},
 	"test_forward":          {handshakeHeaderPacket, []*Packet{{Handshake, 1, []byte{0x01}}}, nil},
 	"test_forward_many":     {append(handshakeHeaderPacket, handshakeHeaderPacket...), []*Packet{{Handshake, 1, []byte{0x01}}, {Handshake, 1, []byte{0x01}}}, nil},
 }
@@ -89,8 +88,8 @@ var encodeTables = map[string]struct {
 	err        error
 }{
 	"test_encode_handshake":    {Handshake, []byte{0x00, 0x00, 0x02}, []byte{0x01, 0x00}, nil},
-	"test_invalid_packet_type": {0xff, nil, nil, errors.New("wrong packet type")},
-	"test_too_big_packet":      {Data, nil, tooBigData, errors.New("codec: packet size exceed")},
+	"test_invalid_packet_type": {0xff, nil, nil, ErrWrongPacketType},
+	"test_too_big_packet":      {Data, nil, tooBigData, ErrPacketSizeExceed},
 }
 
 func TestEncode(t *testing.T) {
