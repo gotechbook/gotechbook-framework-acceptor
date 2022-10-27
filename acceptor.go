@@ -47,7 +47,7 @@ type Conn interface {
 
 type Codec interface {
 	Decode(data []byte) ([]*Packet, error)
-	Encode(typType, data []byte) ([]byte, error)
+	Encode(typType Type, data []byte) ([]byte, error)
 }
 
 type Packet struct {
